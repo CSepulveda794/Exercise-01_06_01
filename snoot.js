@@ -11,6 +11,8 @@
 var twentyNine = document.createDocumentFragment();
 var thirty = document.createDocumentFragment();
 var thirtyOne = document.createDocumentFragment();
+var formValidity = true;
+
 
 
 // a function to remove select width default 
@@ -19,6 +21,7 @@ function removeSelectDefaults() {
     for (var i = 0; i < emptyBoxes.length; i++){
         emptyBoxes[i].selectedIndex = -1;
     }
+    
 }
 
 //function to set up document fragments for days of the month
@@ -33,6 +36,7 @@ function setUpDays(){
     thirtyOne.appendChild(dates[29].cloneNode(true));
     thirtyOne.appendChild(dates[30].cloneNode(true));
     
+    
    
 }
 
@@ -45,6 +49,7 @@ function updateDays(){
    var dates = deliveryDay.getElementsByTagName("option");
    var deliveryMonth = document.getElementById("delivMo");
    var deliveryYear = document.getElementById("delivYr");
+   var deliveryDay = document.getElementById("everyYr");
    var selectedMonth = deliveryMonth.options[deliveryMonth.selectedIndex].value;
    while (dates[28]) {
        deliveryDay.removeChild(dates[28]);
@@ -105,6 +110,52 @@ function copyBillingAddress() {
         document.querySelector("#deliveryAddress select").selectedIndex = -1;
     }
 }
+// function to validate address - billing & delivery 
+function validateAddress(fieldsetId) {
+    var InputElements = document.querySelectorAll("#" + fieldsetId + " input");
+    var errorDiv = document.querySelectorAll("#" + fieldsetId + " .errorMessage"[0]);
+    var fieldsetValidity = true;
+    var elementCount = InputElements.length;
+    var currentElement;
+    try  {
+        alert("im executing ")
+    }
+    catch(msg) {
+        errorDiv.style.display = "block";
+        errorDiv.innerHTML = msg;
+        formValidity = false;
+    }
+}
+
+// function to validate an entire form 
+
+function validateForm(evt) {
+    if (evt.preventDefault) {
+        evt.preventDefault();
+    }
+    else {
+        evt.returnvalue = false;
+    }
+
+    formValidity = true;
+    validateAddress(billingAddress);
+    validateAddress(deliveryAdress);
+
+    if (formValidity === true) { //form is valid
+        document.getElementById("errorText").innerHTML = "";
+        document.getElementById("errorText").style.display = "none";
+        document.getElementById("form")[0].submit();
+    }
+    else {
+        document.getElementById('errorText').innerHTML = "Please fix the indicated problems and then resubmit your order.";
+        document.getElementById("errorText").style.display = "block";
+        scroll(0, 0);
+    }
+}
+
+
+
+
 
 
 // function that sets upp page on a load event 
@@ -142,8 +193,15 @@ function createEventListeners() {
     var same = document.getElementById("sameAddr");
     if (same.addEventListener) {
         same.addEventListener("change", copyBillingAddress, false);
-    } else if (window.attachEvent) {
+    } else if (same.attachEvent) {
         same.attachEvent("onchange", copyBillingAddress);
+    }
+
+    var form = document.getElementsByTagName("form")[0];
+    if (form.addEventListener) {
+        form.addEventListener("submit", validateForm, false);
+    } else if (form.attachEvent) {
+        form.attachEvent("onSubmit", validateForm);
     }
 }
 
