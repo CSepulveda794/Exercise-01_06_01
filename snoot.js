@@ -112,13 +112,48 @@ function copyBillingAddress() {
 }
 // function to validate address - billing & delivery 
 function validateAddress(fieldsetId) {
-    var InputElements = document.querySelectorAll("#" + fieldsetId + " input");
-    var errorDiv = document.querySelectorAll("#" + fieldsetId + " .errorMessage"[0]);
+    var inputElements = document.querySelectorAll("#" + fieldsetId + " input");
+    var errorDiv = document.querySelectorAll("#" + fieldsetId + " .errorMessage")[0];
     var fieldsetValidity = true;
-    var elementCount = InputElements.length;
+    var elementCount = inputElements.length;
     var currentElement;
     try  {
-        alert("im executing ")
+        //loop through input fields looking for blanks
+        for (var i = 0; i < elementCount; i++) {
+            currentElement = inputElements[i];
+            //blanks
+            if(currentElement.value === ""){
+                // debugger;
+                currentElement.style.background = "rgb(255,233,233)";
+                fieldsetValidity = false;
+            }
+            //not blanks
+            else {
+                currentElement.style.background = "white";
+            }
+        }
+        //validate select field list
+        currentElement = document.querySelectorAll("#" + fieldset + " select")[0];
+        if (currentElement.selectedIndex === -1) {
+            currentElement.style.border = "1px solid red";
+            fieldsetValidity = false;
+        }
+        else {
+            currentElement.style.border = "";
+        }
+        // action for invalid fieldset
+        if (fieldsetValidity == false){
+            if (fieldsetId === "billingAddress") {
+                throw "please complete all Billing Address information"
+            }
+            else {
+                throw "Please complete all Delivery Address information"
+            }
+        }
+        else {
+            errorDiv.style.display = "none";
+            errorDiv.innerHTML = "";
+        }
     }
     catch(msg) {
         errorDiv.style.display = "block";
@@ -138,8 +173,8 @@ function validateForm(evt) {
     }
 
     formValidity = true;
-    validateAddress(billingAddress);
-    validateAddress(deliveryAdress);
+    validateAddress("billingAddress");
+    validateAddress("deliveryAddress");
 
     if (formValidity === true) { //form is valid
         document.getElementById("errorText").innerHTML = "";
@@ -201,7 +236,7 @@ function createEventListeners() {
     if (form.addEventListener) {
         form.addEventListener("submit", validateForm, false);
     } else if (form.attachEvent) {
-        form.attachEvent("onSubmit", validateForm);
+        form.attachEvent("onsubmit", validateForm);
     }
 }
 
